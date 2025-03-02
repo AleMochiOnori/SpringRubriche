@@ -95,7 +95,7 @@ public class ContattoEntity {
 
 
 
-	public boolean isPreferred() {
+	public boolean getIsPreferred() {
 		return isPreferred;
 	}
 
@@ -104,6 +104,13 @@ public class ContattoEntity {
 	public void setPreferred(boolean isPreferred) {
 		this.isPreferred = isPreferred;
 	}
+
+
+
+	
+
+
+
 	
 	
 	

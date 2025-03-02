@@ -3,7 +3,6 @@ package com.spring.rubrica.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.spring.rubrica.entity.ContattoEntity;
 
 public class RubricaEntity {
 		int id;
@@ -19,11 +18,11 @@ public class RubricaEntity {
 		 
 		 
 		
-		public RubricaEntity(int id, String nomePropetario , int annoDiCreazione) {
+		public RubricaEntity(int id, String nomePropetario , int annoDiCreazione , List<ContattoEntity> listaContatti) {
 			this.id = id;
 			this.nomePropetario = nomePropetario;
 			this.annoDiCreazione = annoDiCreazione;
-
+			this.listaContatti = listaContatti;
 		}
 
 
@@ -54,6 +53,16 @@ public class RubricaEntity {
 
 		public void setAnnoDiCreazione(int annoDiCreazione) {
 			this.annoDiCreazione = annoDiCreazione;
+		}
+
+
+		public void setListaContatti(List<ContattoEntity> listaContatti) {
+			this.listaContatti = listaContatti;
+		}
+		
+		
+		public List<ContattoEntity> getListaContatti() {
+			return listaContatti;
 		}
 		
 		

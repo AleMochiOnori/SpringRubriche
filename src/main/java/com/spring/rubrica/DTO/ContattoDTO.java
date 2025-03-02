@@ -16,9 +16,9 @@ public class ContattoDTO {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.numero = numero;
-		this.gruppoDiAppartenenza = gruppoDiAppartenenza;
+		this.gruppoDiAppartenenza = "Default";
 		this.dataDiNascita = dataDiNascita;
-		this.isPreferred = isPreferred;
+		this.isPreferred = false;
 	}
 
 
@@ -95,7 +95,7 @@ public class ContattoDTO {
 
 
 
-	public boolean isPreferred() {
+	public boolean getIsPreferred() {
 		return isPreferred;
 	}
 

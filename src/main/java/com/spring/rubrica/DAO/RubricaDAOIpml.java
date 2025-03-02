@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.spring.rubrica.entity.ContattoEntity;
 import com.spring.rubrica.entity.RubricaEntity;
 
 
@@ -37,6 +38,33 @@ public class RubricaDAOIpml implements RubricaDAO {
 		RubricaEntity utente = mappa.remove(idUtente);
 		return utente!=null;
 	}
+	
+		public boolean addContattoToRubrica(Integer idRubrica, ContattoEntity contatto) {
+		    RubricaEntity rubrica = mappa.get(idRubrica);
+		    if (rubrica == null) {
+		        return false; 
+		    }
+		    rubrica.getListaContatti().add(contatto);
+		    return true;
+		}
+	
+		public ContattoEntity selectContattoById(Integer idRubrica, int idContatto) {
+		    RubricaEntity rubrica = mappa.get(idRubrica);
+		    if (rubrica == null ) {
+		        return null;
+		    }
+
+		    for (ContattoEntity contatto : rubrica.getListaContatti()) {
+		        if (contatto.getId() == idContatto) {  
+		            return contatto;
+		        }
+		    }
+
+		    return null; 
+		}
+		
+		
+	
 
 
 }

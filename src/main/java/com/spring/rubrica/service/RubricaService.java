@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.spring.rubrica.DAO.RubricaDAO;
 import com.spring.rubrica.DTO.NomiPropietariDTO;
@@ -19,7 +20,7 @@ import com.spring.rubrica.DTO.NomeCognomeGruppoDTO;
 import com.spring.rubrica.entity.ContattoEntity;
 import com.spring.rubrica.entity.RubricaEntity;
 import com.spring.rubrica.conversioni.Conversioni;
-
+@Service
 public class RubricaService {
 	@Autowired
 	private RubricaDAO dao;
@@ -36,14 +37,11 @@ public class RubricaService {
 	
 	public RubricaDTO cercaPerId(Integer id) {
 		RubricaEntity rubrica=	dao.selectById(id);
-		if(rubrica != null) {
-			RubricaDTO dto = Conversioni.daRubricaEntityARubricaDTO(rubrica);
-			return dto;	
-		}
+		RubricaDTO dto = Conversioni.daRubricaEntityARubricaDTO(rubrica);
+		return dto;	
 		
-		return null;
 		
-			
+				
 	}
 	
 	
@@ -129,7 +127,7 @@ public class RubricaService {
 	public nomeListaPiùVecchia visualizzaPropietarioEListaVecchia() {
 	    List<RubricaEntity> list = dao.selectAll();
 	    if (list.isEmpty()) {
-	        return null;
+	    	throw new RuntimeException("La rubrica è vuota");
 	    }
 	    RubricaEntity rubricaPiuVecchia = list.stream()
 	            .min(Comparator.comparingInt(RubricaEntity::getAnnoDiCreazione))
@@ -138,7 +136,7 @@ public class RubricaService {
 	    if (rubricaPiuVecchia != null) {
 	        return new nomeListaPiùVecchia(rubricaPiuVecchia.getNomePropetario(), rubricaPiuVecchia.getAnnoDiCreazione());
 	    } else {
-	        return null;
+	    	throw new RuntimeException("La rubrica non esiste");
 	    }
 	}
 
@@ -147,7 +145,7 @@ public class RubricaService {
 	public List<AnnoCreazioneDTO> visulizzaAnniCreazioneOrdineCrescente(){
 		List<RubricaEntity> list = dao.selectAll();
 	    if (list.isEmpty()) {
-	        return null;
+	    	throw new RuntimeException("La rubrica è vuota");
 	    }
 	    List<AnnoCreazioneDTO> ordered = list.stream()
 	               .sorted(Comparator.comparingInt(RubricaEntity::getAnnoDiCreazione)) 
@@ -197,114 +195,96 @@ public class RubricaService {
 	        return contatto; 
 	    }
 
-	    return null;
+	    throw new RuntimeException("Il contatto non esiste");
 	}
 
-	public List<ContattoDTO> mostraTuttiIContatti() {
-		List<RubricaEntity> list =  dao.selectAll();
-		ArrayList<ContattoDTO> listaDto = new ArrayList<>();
-		
-		for (RubricaEntity rubrica : list) {
-			for(ContattoEntity contatto : rubrica.getListaContatti()) {
-				listaDto.add(Conversioni.daContattoEntityAContattoDTO(contatto));
-			}
-			
+	public List<ContattoDTO> mostraTuttiIContatti(Integer idRubrica) {
+		 RubricaEntity contatto = dao.selectById(idRubrica);
+		 ArrayList<ContattoDTO> listaDto = new ArrayList<>();
+		 for(ContattoEntity c : contatto.getListaContatti()) {
+			listaDto.add(Conversioni.daContattoEntityAContattoDTO(c));
 		}
-		
 		return listaDto;
 	}
 	
 	
 	
-	public Integer contattiRegistrati() {
-		List<RubricaEntity> list =  dao.selectAll();
+	public Integer contattiRegistrati(Integer idRubrica) {
+		RubricaEntity rubrica = dao.selectById(idRubrica);
 		Integer numeroContatti = 0 ;
-		for (RubricaEntity rubrica : list) {
-			List<ContattoEntity> listaContatti = rubrica.getListaContatti();
-			 numeroContatti += listaContatti.size();
-			
-		}
-		
+		List<ContattoEntity> listaContatti = rubrica.getListaContatti();
+		numeroContatti += listaContatti.size();
 		return numeroContatti;
 	}
 	
 	
 	
-	public ContattoDTO ricercaByNumero(Integer numero) {
-		List<RubricaEntity> list =  dao.selectAll();
-		for (RubricaEntity rubrica : list) {
-			for(ContattoEntity contatto : rubrica.getListaContatti()) {
-				if (contatto.getNumero() == numero) {
-					 return Conversioni.daContattoEntityAContattoDTO(contatto);
+	public ContattoDTO ricercaByNumero(Integer idRubrica , Integer numero) {
+		RubricaEntity rubrica = dao.selectById(idRubrica);
+		for(ContattoEntity c : rubrica.getListaContatti()) {
+			if (c.getNumero() == numero) {
+				return Conversioni.daContattoEntityAContattoDTO(c);
+			}
+				
+				throw new RuntimeException("Il numero di appartenenza non esiste");
+			}
+				
+		throw new RuntimeException("Il contatto non esiste");
+	}
+	
+	
+	
+	public NomeCognomeGruppoDTO ricercaByGruppo(Integer idRubrica , String nomeGruppo) {
+		RubricaEntity rubrica = dao.selectById(idRubrica);
+		for(ContattoEntity contatto : rubrica.getListaContatti()) {
+			if (contatto.getGruppoDiAppartenenza().equals(nomeGruppo) ) {
+				return new NomeCognomeGruppoDTO(contatto.getNome() , contatto.getCognome());
 				}
+			
+			throw new RuntimeException("Il nome del gruppo non esiste");
 			
 				
 			}
-				
-		}
-		return null;
+		
+		throw new RuntimeException("Il contatto non esiste");
+		
 	}
 	
-	
-	
-	public NomeCognomeGruppoDTO ricercaByGruppo(String nomeGruppo) {
-		List<RubricaEntity> list =  dao.selectAll();
-		for (RubricaEntity rubrica : list) {
-			for(ContattoEntity contatto : rubrica.getListaContatti()) {
-				if (contatto.getGruppoDiAppartenenza().equals(nomeGruppo) ) {
-					return new NomeCognomeGruppoDTO(contatto.getNome() , contatto.getCognome());
-				}
+	public List<ContattoDTO> eliminaContattiDaGruppo(Integer idRubrica , String nomeGruppo){
+		RubricaEntity rubrica = dao.selectById(idRubrica);
+		for(ContattoEntity contatto : rubrica.getListaContatti()) {
+			if (contatto.getGruppoDiAppartenenza().equals(nomeGruppo) ) {
+				dao.delete(contatto.getId());
+			}
 			
-				
-			}
-				
-		}
-		return null;
-		
-	}
-	
-	public List<ContattoDTO> eliminaContattiDaGruppo(String nomeGruppo){
-		List<RubricaEntity> list =  dao.selectAll();
-		for (RubricaEntity rubrica : list) {
-			for(ContattoEntity contatto : rubrica.getListaContatti()) {
-				if (contatto.getGruppoDiAppartenenza().equals(nomeGruppo) ) {
-					dao.delete(contatto.getId());
-				}
-			
-				
-			}
+			throw new RuntimeException("Il nome del gruppo non esiste");
 		}
 		
-		return null;
+		throw new RuntimeException("Il contatto non esiste");
 	}
 	
 	
-	public ContattoDTO modificaPreferenza() {
-		List<RubricaEntity> list =  dao.selectAll();
-		for (RubricaEntity rubrica : list) {
-			for(ContattoEntity contatto : rubrica.getListaContatti()) {
-				contatto.setPreferred(true) ;
-			}
+	public ContattoDTO modificaPreferenza(Integer idRubrica) {
+		RubricaEntity rubrica = dao.selectById(idRubrica);
+		for(ContattoEntity contatto : rubrica.getListaContatti()) {
+			contatto.setPreferred(true) ;
 		}
 		
-		return null;
+		throw new RuntimeException("Il contatto non esiste");
 	}
 	
 	
 	
-	public ContattoDTO ricercaPreferiti() {
-		List<RubricaEntity> list =  dao.selectAll();
+	public ContattoDTO ricercaPreferiti(Integer idRubrica) {
+		RubricaEntity rubrica = dao.selectById(idRubrica);
 		ArrayList<ContattoDTO> preferiti = new ArrayList<>();
-		for (RubricaEntity rubrica : list) {
-			for(ContattoEntity contatto : rubrica.getListaContatti()) {
-				if (contatto.getIsPreferred() == true) {
-					preferiti.add(Conversioni.daContattoEntityAContattoDTO(contatto));
-				}
+		for(ContattoEntity contatto : rubrica.getListaContatti()) {
+			if (contatto.getIsPreferred() == true) {
+				preferiti.add(Conversioni.daContattoEntityAContattoDTO(contatto));
 			}
-	
 		}
 		
-		return null;
+		throw new RuntimeException("Il contatto non esiste");
 	}
 }
 

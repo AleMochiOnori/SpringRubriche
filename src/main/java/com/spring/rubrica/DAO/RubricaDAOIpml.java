@@ -28,39 +28,49 @@ public class RubricaDAOIpml implements RubricaDAO {
 	}
 
 		public RubricaEntity selectById(Integer idUtente) {
-		return mappa.get(idUtente);
+		RubricaEntity rubrica =  mappa.get(idUtente);
+		if(rubrica!= null)
+			return rubrica;
+		else
+			throw new RuntimeException("id non presente");
 	}
 
 
 
 
 		public boolean delete(Integer idUtente) {
-		RubricaEntity utente = mappa.remove(idUtente);
-		return utente!=null;
-	}
+			RubricaEntity utente = mappa.remove(idUtente);
+			if (utente!=null) {
+				return true;
+			}
+		
+			else {
+				throw new RuntimeException("id non presente");
+			}
+		}
 	
 		public boolean addContattoToRubrica(Integer idRubrica, ContattoEntity contatto) {
 		    RubricaEntity rubrica = mappa.get(idRubrica);
-		    if (rubrica == null) {
-		        return false; 
+		    if (rubrica != null) {
+		    	rubrica.getListaContatti().add(contatto);
+		        return true;
+		    } else {
+		    	throw new RuntimeException("id non presente"); 
+		    	
 		    }
-		    rubrica.getListaContatti().add(contatto);
-		    return true;
 		}
 	
 		public ContattoEntity selectContattoById(Integer idRubrica, int idContatto) {
 		    RubricaEntity rubrica = mappa.get(idRubrica);
-		    if (rubrica == null ) {
-		        return null;
+		    if (rubrica != null ) {
+		    	 for (ContattoEntity contatto : rubrica.getListaContatti()) {
+				        if (contatto.getId() == idContatto) {  
+				            return contatto;
+				        }
+				    }
 		    }
-
-		    for (ContattoEntity contatto : rubrica.getListaContatti()) {
-		        if (contatto.getId() == idContatto) {  
-		            return contatto;
-		        }
-		    }
-
-		    return null; 
+		    
+		    throw new RuntimeException("Id Contatto non trovato"); 
 		}
 		
 		

@@ -211,10 +211,14 @@ public class RubricaService {
 	
 	public Integer contattiRegistrati(Integer idRubrica) {
 		RubricaEntity rubrica = dao.selectById(idRubrica);
-		Integer numeroContatti = 0 ;
+		if (rubrica == null) {
+			throw new RuntimeException("La rubrica non esiste");
+		}
 		List<ContattoEntity> listaContatti = rubrica.getListaContatti();
-		numeroContatti += listaContatti.size();
-		return numeroContatti;
+		if (listaContatti == null) {
+			throw new RuntimeException("La rubrica è vuota");
+		}
+		return listaContatti.size();
 	}
 	
 	

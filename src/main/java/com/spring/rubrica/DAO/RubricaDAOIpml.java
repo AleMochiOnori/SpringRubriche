@@ -27,8 +27,8 @@ public class RubricaDAOIpml implements RubricaDAO {
 			return new ArrayList<RubricaEntity>(mappa.values());
 	}
 
-		public RubricaEntity selectById(Integer idUtente) {
-		RubricaEntity rubrica =  mappa.get(idUtente);
+		public RubricaEntity selectById(Integer idRubrica) {
+		RubricaEntity rubrica =  mappa.get(idRubrica);
 		if(rubrica!= null)
 			return rubrica;
 		else

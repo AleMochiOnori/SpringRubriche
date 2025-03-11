@@ -4,6 +4,8 @@ import com.spring.rubrica.DTO.*;
 import com.spring.rubrica.entity.ContattoEntity;
 import com.spring.rubrica.service.RubricaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -108,4 +110,13 @@ public class Controller {
     public ContattoDTO ricercaPreferiti(@PathVariable Integer idRubrica) {
         return rubricaService.ricercaPreferiti(idRubrica);
     }
+    
+    
+    @ExceptionHandler
+    public ResponseEntity<ErroreDTO> handler(RuntimeException exc){
+    	ErroreDTO error = new ErroreDTO(exc.getMessage());
+    	ResponseEntity<ErroreDTO> response = new ResponseEntity<ErroreDTO>(error,HttpStatus.INTERNAL_SERVER_ERROR);
+    	return response;
+    }
+    
 }
